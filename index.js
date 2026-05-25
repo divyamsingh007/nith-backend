@@ -57,12 +57,18 @@ app.get('/', (req, res) => {
   res.send('Hello from Express!');
 });
 
-app.post('/api/upload', upload.single('file'), (req, res) => {
-  if (req.file) {
-    res.json({ success: true, url: req.file.location });
-  } else {
-    res.status(400).json({ error: 'No file uploaded' });
-  }
+app.post('/api/upload', (req, res) => {
+  upload.single('file')(req, res, (err) => {
+    if (err) {
+      console.error('Upload middleware error:', err);
+      return res.status(500).json({ success: false, error: err.message || 'Error occurred during file upload' });
+    }
+    if (req.file) {
+      res.json({ success: true, url: req.file.location });
+    } else {
+      res.status(400).json({ success: false, error: 'No file uploaded' });
+    }
+  });
 });
 
 

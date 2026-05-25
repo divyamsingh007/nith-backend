@@ -5,6 +5,9 @@ const db = require('../db/db');
 // 1. GET all Annual Alumni Meet page data in a single optimized payload
 router.get('/', async (req, res) => {
   try {
+    // Auto-migrate: ensure the column exists
+    await db.query('ALTER TABLE alumni_annual_meet_heading ADD COLUMN IF NOT EXISTS upcoming_image TEXT;');
+
     const headingRes = await db.query('SELECT * FROM alumni_annual_meet_heading LIMIT 1');
     const scheduleRes = await db.query('SELECT * FROM alumni_annual_meet_schedule ORDER BY id ASC');
     const pastRes = await db.query('SELECT * FROM alumni_annual_meet_past ORDER BY id ASC');
@@ -39,6 +42,7 @@ router.put('/heading', async (req, res) => {
     'upcoming_venue_en', 'upcoming_venue_hn',
     'upcoming_desc_en', 'upcoming_desc_hn',
     'upcoming_reg_open',
+    'upcoming_image',
     
     'involve_title_en', 'involve_title_hn',
     'involve_desc_en', 'involve_desc_hn',
